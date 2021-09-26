@@ -75,7 +75,6 @@ class Recommender:
     # and a boolean 0 to Brands not ordered by the user.
     def getBrandDataWeights(self, userId):
         orderHistory = self.orderDetails.loc[self.orderDetails['uid'] == userId]
-        print(orderHistory)
         userBrandData = np.zeros(self.numOfProducts)
         # to avoid repeating computation for already calculated brand
         visited = set()
@@ -99,9 +98,7 @@ class Recommender:
             newArray.append([productCorr[i], i])
         newArray = sorted(newArray, reverse=True)
 
-        for i in range(0, 10):
-            print(productCorr[newArray[i][1]],
-                  self.productList[newArray[i][1]])
+
 
     """
     Main function being called for recommendations of a specific user. 
@@ -114,7 +111,7 @@ class Recommender:
         correlationMatrix = self.getCorrelationMatrix(userId)
         searchQueries = self.browserHistory.loc[self.browserHistory['uid']
                                                 == userId]['search'].values.tolist()
-        print(searchQueries)
+
         productsSimilarToBrowsed = []
         for item in searchQueries:
             for product in self.productList:
@@ -140,17 +137,14 @@ class Recommender:
             entireProductList.append(self.productList[index])
 
         finalProductListIndex = set()
-        for i in range(0, min(len(entireProductList), 10)):
-            randNum = random.randint(0, len(entireProductList)-1)
-            finalProductListIndex.add(randNum)
 
-        print(finalProductListIndex)
+        for i in range(0, min(len(entireProductList), 10)):
+            finalProductListIndex.add(i)
+
         finalProductList = []
         for num in finalProductListIndex:
             finalProductList.append(entireProductList[num])
 
-        for product in finalProductList:
-            print(product)
         return finalProductList
 
     def getCorrelationMatrix(self, userId):
@@ -171,8 +165,6 @@ class Recommender:
         productXAttributes = productXAttributes.T
         productXAttributes = productXAttributes.astype(float)
         productXAttributes = productXAttributes.dropna()
-        productXAttributes.to_csv("TemporaryMatrix.csv", index=False)
-        print(productXAttributes)
         print(np.corrcoef(productXAttributes))
 
         corrcoef = np.corrcoef(productXAttributes)
