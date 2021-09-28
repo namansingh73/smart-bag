@@ -1,3 +1,4 @@
+
 import random
 import numpy as np
 import pandas as pd
@@ -22,8 +23,8 @@ class Recommender:
 
     # Retrieve the entire browseHistory dataset
     def get_browserHistory(self):
-        orders = pd.read_csv("browseHistory.csv")
-        return orders
+        browse = pd.read_csv("browseHistory.csv")
+        return browse
 
     # Retrieve the entire products dataset, and extract some variables used later
     def get_products(self):
@@ -112,41 +113,54 @@ class Recommender:
         searchQueries = self.browserHistory.loc[self.browserHistory['uid']
                                                 == userId]['search'].values.tolist()
 
-        productsSimilarToBrowsed = []
+        productsSimilarToBrowsed = set()
         for item in searchQueries:
             for product in self.productList:
                 pname = product[1]
                 pid = product[0]
                 val = fuzz.token_set_ratio(item, pname)
                 if val > 75:
-                    productsSimilarToBrowsed.append(pid)
+                    productsSimilarToBrowsed.add(pid)
+        finalProductList = []
 
         # This part is just adding products according to correlation matrix. Rest of the code is just to avoid repeating entries.
-        entireProductListIndex = set()
+        entireProductListIndex = []
         for productId in productsSimilarToBrowsed:
             productCorr = correlationMatrix[productId]
             newArray = []
             for i in range(0, len(productCorr)):
                 newArray.append([productCorr[i], i])
             newArray = sorted(newArray, reverse=True)
+            temp=[] 
+            for i in range(0, 3):  # taking top 2 product after 1. for now
+                entireProductListIndex.append(newArray[i][1])
+                temp.append(self.productList[newArray[i][1]])
+        
 
-            for i in range(1, 3):  # taking only top product after 1. for now
-                entireProductListIndex.add(newArray[i][1])
         entireProductList = []
-        for index in entireProductListIndex:
-            entireProductList.append(self.productList[index])
+        for id in entireProductListIndex:
+            entireProductList.append(self.productList[id])
+        
 
         finalProductListIndex = set()
 
-        for i in range(0, min(len(entireProductList), 10)):
-            finalProductListIndex.add(i)
+        for i in range(0, min(len(entireProductList), 15)):
+            randNum = random.randint(0,len(entireProductList)-1)
+            finalProductListIndex.add(randNum)
 
-        finalProductList = []
         for num in finalProductListIndex:
-            finalProductList.append(entireProductList[num])
-
+            currentProduct = entireProductList[num] 
+            insert = True
+            for prod in finalProductList:
+                if(prod==currentProduct):
+                    insert=False
+                    break
+            if insert==True:
+                finalProductList.append(entireProductList[num])
+    
         return finalProductList
 
+    #Returns the correlation coefficient matrix
     def getCorrelationMatrix(self, userId):
 
         # Get attribute values ( all normalized between 0 and 1 )
@@ -184,11 +198,3 @@ class Recommender:
 # r = Recommender(8)
 # r.getProductRecommendation(8)
 
-
-# Add after index =[] wali line to add dummy random variables
- # for i in range(1,4):
-        #     dummyData = []
-        #     for product in self.products.values:
-        #         dummyData.append(random.random())
-        #     totalData.append(dummyData)
-        #     index.append('dummy' + str(i))

@@ -4,10 +4,8 @@ import os
 
 app = Flask(__name__)
 
-# Call Recommender init here. Training yaha hogayi server chalte hi.
-# Routes me use Recommender ka getRecommendation function, ye instantly return karega
-
-# JS calls Flask, Flask me routes h jisme we send recommendations, update/insert/edit dataset ( jaha pe bhi wo hosted h )
+# Call Recommender init here. Training part
+# JS calls Flask, Flask routes call functions of Recommender()
 REC = Recommender()
 
 
