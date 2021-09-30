@@ -8,10 +8,6 @@ To get the backend setup working locally, you can first of all clone the reposit
 git clone https://github.com/namansingh73/smartBag
 ```
 
-Next, you shall be able to see a file structure of this kind.
-
-![Backend File Structure](assets/fileStructure.png)
-
 The next step would be installing the required packages from the requirements.txt file.
 The correct way to do it would be writing the following command in your Command Line Interface:
 
